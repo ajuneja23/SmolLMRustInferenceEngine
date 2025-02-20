@@ -1,0 +1,28 @@
+[package]
+name = "streamed_grpc"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "computation-server"
+path = "src/server.rs"
+
+[[bin]]
+name = "computation-client"
+path = "src/client.rs"
+
+[dependencies]
+tonic = "0.7"
+prost = "0.10"
+async-stream = "0.3"
+futures="0.3"
+tokio-stream="0.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rand = "0.8"
+tokio = { version = "1.0", features = ["full"] }
+chrono="0.4"
+[build-dependencies]
+tonic-build = "0.7"

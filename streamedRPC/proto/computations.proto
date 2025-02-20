@@ -1,0 +1,22 @@
+syntax="proto3";
+
+package computations; 
+
+service computations{
+    rpc sendComputation (CompReq) returns (stream CompRes);
+};
+
+message CompReq {
+    string description=1; 
+    repeated uint32 a=2;
+    repeated uint32 b=3;
+    repeated uint32 c=4;
+}
+
+message CompRes {
+    bool successful=1;
+    uint32 ans=2;//each should be a+b+c
+    string message=3;
+}
+
+
