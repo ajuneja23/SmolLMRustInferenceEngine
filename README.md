@@ -27,3 +27,12 @@ Instructions for running:
 
 1. Open your Docker Daemon. Navigate to `pyInference/inferenceNode` and run `docker build -t smollm .`. Then run `docker-compose up -d`.
 2. Navigate to `rustClient`. Edit `jobs.txt` with the prompts you would like to have inference run on. Run `cargo build` and then `cargo run --bin LMClient`.
+
+## Example Terminal Output
+
+![Terminal Output](exampke_terminal_output.png)
+
+1. Each green portion represents a token being streamed back from the client.
+2. Each dark blue portion represents when a new prompt starts being processed by a node.
+3. Each light blue portion represents the final SmolLM output for a given prompt.
+4. Each purple portion represents an update on the number of jobs either queued/in progress for a certain node after a job is completed.
