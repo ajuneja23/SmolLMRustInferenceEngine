@@ -30,7 +30,7 @@ Instructions for running:
 
 ## Example Terminal Output
 
-![Terminal Output](exampke_terminal_output.png)
+![Terminal Output](example_terminal_output.png)
 
 1. Each green portion represents a token being streamed back from the client.
 2. Each dark blue portion represents when a new prompt starts being processed by a node.
