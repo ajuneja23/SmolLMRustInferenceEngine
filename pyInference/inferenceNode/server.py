@@ -9,32 +9,48 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import grpc
+from datetime import datetime
+import os
+
 import logging
 import asyncio
 
-# Define the folder path
-folder_path = "./SmolLM"
 
-# Check if the folder exists
+log_dir = "./logs"
+os.makedirs(log_dir, exist_ok=True)
+port = int(os.getenv("INTERNAL_PORT", 8080))
+folder_path = "./SmolLM"
+log_file = f"{log_dir}/server_{port}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler(), logging.FileHandler(log_file)],
+)
+
+logger = logging.getLogger("smollm_server")
+logger.setLevel(logging.DEBUG)
+
+
 if not os.path.exists(folder_path):
-    # If not, create the folder
     os.makedirs(folder_path)
-    # Load the model and tokenizer directly
+    logger.info("Downloading model")
     tokenizer = AutoTokenizer.from_pretrained("HuggingFaceTB/SmolLM-135M-Instruct")
     model = AutoModelForCausalLM.from_pretrained("HuggingFaceTB/SmolLM-135M-Instruct")
-
     tokenizer.save_pretrained(folder_path)
     model.save_pretrained(folder_path)
+    logger.info("Model saved successfully")
 else:
 
     tokenizer = AutoTokenizer.from_pretrained(folder_path)
     model = AutoModelForCausalLM.from_pretrained(folder_path)
+    logger.info("Model loaded successfully")
 
 
 class SmolLMServicer(smollm_pb2_grpc.smollmServicer):
     def sendReq(self, request, context):
         prompt = request.prompt
         max_tokens = 20
+        logging.info(f"Node {port-8079} has received request: {prompt}")
         input_ids = tokenizer.encode(prompt, return_tensors="pt")
         generated_tokens = []
 
@@ -67,7 +83,8 @@ class SmolLMServicer(smollm_pb2_grpc.smollmServicer):
 async def serve():
     server = grpc.aio.server()
     smollm_pb2_grpc.add_smollmServicer_to_server(SmolLMServicer(), server)
-    listen_addr = "[::]:50051"
+    listen_addr = "[::]:" + str(os.getenv("INTERNAL_PORT", 8080))
+    print(f"Listening on {listen_addr}")
     server.add_insecure_port(listen_addr)
     logging.info("Starting server on %s", listen_addr)
     await server.start()
